@@ -2,7 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-public class StudentReportManager {
+public class Report {
     public static void main(String[] args) {
         Student[] students = new Student[100];
         int studentCount = 0;
