@@ -1,14 +1,12 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintStream;
 //----------DONT EDIT ABOVE THIS LINE-----------
 
 public class Report {
+
     public static String generateReport() {
         Student[] students = new Student[100]; 
         int studentCount = 0;
@@ -58,10 +56,7 @@ public class Report {
         System.setOut(ps);
         // ----------DONT EDIT ABOVE THIS LINE-----------
 
-        for (int i = 0; i < studentCount; i++) {
-            students[i].printData(); 
-            System.out.println(); 
-        }
+        printData(students, studentCount);
 
         System.out.println("Summary of each student's fees assessed: "); 
         System.out.println(); 
@@ -70,7 +65,7 @@ public class Report {
             System.out.printf("%s %s has $%,.0f fees assessed \n", 
                 students[i].firstName, students[i].lastName, students[i].computeFees());
         }
-        System.out.println(); 
+        System.out.println();
 
         double degNoAid = 0, degAid = 0, cert = 0, senior = 0;
         for (int i = 0; i < studentCount; i++) {
@@ -88,14 +83,20 @@ public class Report {
         System.out.printf("Degree-seeking students with financial assistance: $%,.0f\n", degAid);
         System.out.printf("Certificate students: $%,.0f\n", cert);
         System.out.printf("Senior citizens: $%,.0f\n", senior);
-        
-        System.out.println(); 
+        System.out.println();
         System.out.printf("Total fees assessed: $%,.0f\n", (degNoAid + degAid + cert + senior));
 
         // ----------DONT EDIT BELOW THIS LINE-----------
         System.out.flush();
         System.setOut(old);
         return baos.toString();
+    }
+
+    public static void printData(Student[] students, int count) {
+        for (int i = 0; i < count; i++) {
+            students[i].printData(); 
+            System.out.println(); 
+        }
     }
 
     private static String mapMajor(String c) {
