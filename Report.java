@@ -1,101 +1,107 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintStream;
 
 public class Report {
-    public static void main(String[] args) {
-        Student[] students = new Student[100];
+    public static String generateReport() {
+        Student[] students = new Student[100]; 
         int studentCount = 0;
 
         try {
-            File file = new File("hw2.txt");
-            Scanner scanner = new Scanner(file);
-
-            while (scanner.hasNextLine() && studentCount < 100) {
-                String line = scanner.nextLine();
+            Scanner sc = new Scanner(new File("hw2.txt")); 
+            while (sc.hasNextLine() && studentCount < 100) {
+                String line = sc.nextLine();
                 if (line.trim().isEmpty()) continue;
+                String[] p = line.split(";"); 
 
-                String[] parts = line.split(";");
-                
-                String id = parts[0].trim();
-                String firstName = parts[1].trim();
-                String lastName = parts[2].trim();
-                int age = Integer.parseInt(parts[3].trim());
-                int credits = Integer.parseInt(parts[4].trim());
-                String degreeSeekingCode = parts[5].trim();
+                String id = p[0].trim();
+                String fName = p[1].trim();
+                String lName = p[2].trim();
+                int age = Integer.parseInt(p[3].trim());
+                int credits = Integer.parseInt(p[4].trim());
+                String isDegree = p[5].trim();
 
-                if (degreeSeekingCode.equalsIgnoreCase("Y")) {
-                    String major = mapMajor(parts[6].trim());
-                    String standing = mapStanding(parts[7].trim());
-                    String aidCode = parts[8].trim();
-
-                    if (aidCode.equalsIgnoreCase("Y")) {
-                        double aidAmount = Double.parseDouble(parts[9].trim());
-                        students[studentCount] = new FinancialAidStudent(id, firstName, lastName, age, credits, major, standing, aidAmount);
+                if (isDegree.equalsIgnoreCase("Y")) {
+                    String major = mapMajor(p[6].trim()); 
+                    String stand = mapStanding(p[7].trim());
+                    String hasAid = p[8].trim();
+                    if (hasAid.equalsIgnoreCase("Y")) {
+                        double aid = Double.parseDouble(p[9].trim());
+                        students[studentCount++] = new FinancialAidStudent(id, fName, lName, age, credits, major, stand, aid);
                     } else {
-                        students[studentCount] = new NonFinancialAidStudent(id, firstName, lastName, age, credits, major, standing);
+                        students[studentCount++] = new NonFinancialAidStudent(id, fName, lName, age, credits, major, stand);
                     }
                 } else {
-                    String typeCode = parts[6].trim();
-                    if (typeCode.equalsIgnoreCase("C")) {
-                        String certType = mapMajor(parts[7].trim());
-                        students[studentCount] = new CertificateStudent(id, firstName, lastName, age, credits, certType);
-                    } else if (typeCode.equalsIgnoreCase("S")) {
-                        students[studentCount] = new SeniorCitizen(id, firstName, lastName, age, credits);
+                    String type = p[6].trim(); 
+                    if (type.equalsIgnoreCase("C")) {
+                        students[studentCount++] = new CertificateStudent(id, fName, lName, age, credits, mapMajor(p[7].trim()));
+                    } else {
+                        students[studentCount++] = new SeniorCitizen(id, fName, lName, age, credits);
                     }
                 }
-                studentCount++;
             }
-            scanner.close();
+            sc.close();
         } catch (FileNotFoundException e) {
-            System.out.println("Error: hw2.txt not found.");
-            return;
+            return "Error: hw2.txt not found.";
         }
 
-        generateReports(students, studentCount);
-    }
+        // ----------DONT EDIT BELOW THIS LINE-----------
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos);
+        PrintStream old = System.out;
+        System.setOut(ps);
+        // ----------DONT EDIT ABOVE THIS LINE-----------
 
-    private static void generateReports(Student[] students, int count) {
-        double degNoAidTotal = 0;
-        double degAidTotal = 0;
-        double certTotal = 0;
-        double seniorTotal = 0;
-
-        System.out.println("--- Report 1: Student Fee Assessment ---");
-        for (int i = 0; i < count; i++) {
-            double fees = students[i].computeFees();
-            System.out.printf("%s %s: $%,.2f\n", students[i].firstName, students[i].lastName, fees);
-
-            if (students[i] instanceof NonFinancialAidStudent) degNoAidTotal += fees;
-            else if (students[i] instanceof FinancialAidStudent) degAidTotal += fees;
-            else if (students[i] instanceof CertificateStudent) certTotal += fees;
-            else if (students[i] instanceof SeniorCitizen) seniorTotal += fees;
+        for (int i = 0; i < studentCount; i++) {
+            students[i].printData(); 
+            System.out.println(); 
         }
 
-        System.out.println("\nSummary of student fees assessed:");
-        System.out.printf("Degree-seeking students without financial assistance: $%,.0f\n", degNoAidTotal);
-        System.out.printf("Degree-seeking students with financial assistance: $%,.0f\n", degAidTotal);
-        System.out.printf("Certificate students: $%,.0f\n", certTotal);
-        System.out.printf("Senior citizens: $%,.0f\n", seniorTotal);
-        System.out.printf("Total fees assessed: $%,.0f\n", (degNoAidTotal + degAidTotal + certTotal + seniorTotal));
+        System.out.println("Summary of each student's fees assessed:");
+        for (int i = 0; i < studentCount; i++) {
+            System.out.printf("%s %s has $%,.0f fees assessed\n", 
+                students[i].firstName, students[i].lastName, students[i].computeFees());
+        }
+        System.out.println(); 
+
+        double degNoAid = 0, degAid = 0, cert = 0, senior = 0;
+        for (int i = 0; i < studentCount; i++) {
+            double fee = students[i].computeFees();
+            if (students[i] instanceof NonFinancialAidStudent) degNoAid += fee;
+            else if (students[i] instanceof FinancialAidStudent) degAid += fee;
+            else if (students[i] instanceof CertificateStudent) cert += fee;
+            else if (students[i] instanceof SeniorCitizen) senior += fee;
+        }
+
+        System.out.println("Summary of student fees assessed:");
+        System.out.printf("Degree-seeking students without financial assistance: $%,.0f\n", degNoAid);
+        System.out.printf("Degree-seeking students with financial assistance: $%,.0f\n", degAid);
+        System.out.printf("Certificate Students: $%,.0f\n", cert);
+        System.out.printf("Senior citizens: $%,.0f\n", senior);
+        System.out.printf("Total fees assessed: $%,.0f\n", (degNoAid + degAid + cert + senior));
+
+        // ----------DONT EDIT BELOW THIS LINE-----------
+        System.out.flush();
+        System.setOut(old);
+        return baos.toString();
     }
 
-    private static String mapMajor(String code) {
-        switch (code.toUpperCase()) {
-            case "S": return "gaming science";
-            case "M": return "hotel management";
-            case "A": return "lounge arts";
-            case "E": return "beverage engineering";
-            default: return "unknown";
+    private static String mapMajor(String c) {
+        switch(c.toUpperCase()) {
+            case "S": return "gaming Science"; case "M": return "hotel Management";
+            case "A": return "lounge Arts"; case "E": return "beverage Engineering";
+            default: return "Unknown";
         }
     }
-
-    private static String mapStanding(String code) {
-        switch (code.toUpperCase()) {
-            case "G": return "good";
-            case "W": return "warning";
-            case "P": return "probation";
-            default: return "unknown";
+    private static String mapStanding(String c) {
+        switch(c.toUpperCase()) {
+            case "G": return "good"; case "W": return "warning";
+            case "P": return "probation"; default: return "Unknown";
         }
     }
 }
