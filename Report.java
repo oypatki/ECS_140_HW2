@@ -56,7 +56,7 @@ public class Report {
         System.setOut(ps);
         // ----------DONT EDIT ABOVE THIS LINE-----------
 
-        printData(students, studentCount);
+        // printData(students, studentCount);
 
         System.out.println("Summary of each student's fees assessed: "); 
         System.out.println(); 
