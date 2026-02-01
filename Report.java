@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+//----------DONT EDIT ABOVE THIS LINE-----------
 
 public class Report {
     public static String generateReport() {
@@ -62,9 +63,11 @@ public class Report {
             System.out.println(); 
         }
 
-        System.out.println("Summary of each student's fees assessed:");
+        System.out.println("Summary of each student's fees assessed: "); 
+        System.out.println(); 
+        
         for (int i = 0; i < studentCount; i++) {
-            System.out.printf("%s %s has $%,.0f fees assessed\n", 
+            System.out.printf("%s %s has $%,.0f fees assessed \n", 
                 students[i].firstName, students[i].lastName, students[i].computeFees());
         }
         System.out.println(); 
@@ -78,11 +81,15 @@ public class Report {
             else if (students[i] instanceof SeniorCitizen) senior += fee;
         }
 
-        System.out.println("Summary of student fees assessed:");
+        System.out.println("Summary of all student fees assessed: ");
+        System.out.println(); 
+        
         System.out.printf("Degree-seeking students without financial assistance: $%,.0f\n", degNoAid);
         System.out.printf("Degree-seeking students with financial assistance: $%,.0f\n", degAid);
-        System.out.printf("Certificate Students: $%,.0f\n", cert);
+        System.out.printf("Certificate students: $%,.0f\n", cert);
         System.out.printf("Senior citizens: $%,.0f\n", senior);
+        
+        System.out.println(); 
         System.out.printf("Total fees assessed: $%,.0f\n", (degNoAid + degAid + cert + senior));
 
         // ----------DONT EDIT BELOW THIS LINE-----------
@@ -93,15 +100,19 @@ public class Report {
 
     private static String mapMajor(String c) {
         switch(c.toUpperCase()) {
-            case "S": return "gaming Science"; case "M": return "hotel Management";
-            case "A": return "lounge Arts"; case "E": return "beverage Engineering";
+            case "S": return "gaming Science"; 
+            case "M": return "hotel Management";
+            case "A": return "lounge Arts"; 
+            case "E": return "beverage Engineering";
             default: return "Unknown";
         }
     }
     private static String mapStanding(String c) {
         switch(c.toUpperCase()) {
-            case "G": return "good"; case "W": return "warning";
-            case "P": return "probation"; default: return "Unknown";
+            case "G": return "good"; 
+            case "W": return "warning";
+            case "P": return "probation"; 
+            default: return "Unknown";
         }
     }
 }

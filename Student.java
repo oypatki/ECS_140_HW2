@@ -1,5 +1,5 @@
 public abstract class Student {
-    protected String id; // Six digits [cite: 8]
+    protected String id; 
     protected String firstName;
     protected String lastName;
     protected int age;
